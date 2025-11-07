@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
 
-const SignupSchema = z.object({ email: z.string().email() });
+const SignupSchema = z.object({ email: z.string().trim().email() });
 
 const signup = async (req, res) => {
   const parsed = SignupSchema.safeParse(req.body);

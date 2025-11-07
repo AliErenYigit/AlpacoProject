@@ -3,20 +3,22 @@ const dotenv = require("dotenv");
 const sequelize = require("./db/database");
 const cors = require("cors");
 const publicRoutes = require('./routes/public');
-
+const adminRoutes = require('./routes/admin');
 
 
 const app = express();
 app.use(cors());
 
-app.use(
-  cors({
-    origin: "http://localhost",
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: "http://localhost",
+//     credentials: true,
+//   })
+// );
+app.use(express.json());
 
-app.use('/', publicRoutes);
+app.use('/api', publicRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Ortam değişkenlerini yükle (.env)
 dotenv.config();
@@ -41,7 +43,7 @@ app.use((err, req, res, next) => {
     await sequelize.authenticate();
     console.log("✅ Veritabanına başarıyla bağlanıldı.");
 
-   await sequelize.sync({ alter: true }); // Sadece geliştirme sürecinde kullan
+   //await sequelize.sync({ alter: true }); // Sadece geliştirme sürecinde kullan
 
     app.listen(PORT, () => {
       console.log(`🚀 Sunucu ${PORT} portunda çalışıyor...`);
