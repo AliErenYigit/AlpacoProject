@@ -1,8 +1,8 @@
 const { z } = require('zod');
 const jwt = require('jsonwebtoken');
-const { defineModels } = require('../models');
+const { User } = require('../models');
 
-const { User } = defineModels();
+
 const SignupSchema = z.object({ email: z.string().email() });
 
 const signup = async (req, res) => {

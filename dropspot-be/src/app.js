@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const sequelize = require("./db/database");
 const cors = require("cors");
+const publicRoutes = require('./routes/public');
+
 
 
 const app = express();
@@ -13,6 +15,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use('/', publicRoutes);
 
 // Ortam değişkenlerini yükle (.env)
 dotenv.config();

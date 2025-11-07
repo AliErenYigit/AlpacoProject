@@ -1,12 +1,10 @@
 {
   "name": "dropspot-be",
   "version": "1.0.0",
-  "main": "src/server.js",
-  "type": "module",
+  "main": "src/app.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "db:sync": "node src/models/sync.js",
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
     "seed:calc": "node src/utils/seed.js"
   },
   "keywords": [],
