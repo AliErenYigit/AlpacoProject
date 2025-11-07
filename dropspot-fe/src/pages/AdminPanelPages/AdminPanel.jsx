@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axiosClient from "../api/axiosClient";
-import AdminDropForm from "../components/AdminDropForm";
+import axiosClient from "../../api/axiosClient";
+import AdminDropForm from "../../components/AdminDropForm";
 
 export default function AdminPanel() {
   const [drops, setDrops] = useState([]);

@@ -1,23 +1,32 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
+import "./DropCard.css";
 
 export default function DropCard({ drop }) {
   const navigate = useNavigate();
+  // Tarihleri Türkiye saatine göre formatla
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("tr-TR", {
+      timeZone: "Europe/Istanbul",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+  const handleClick = () => {
+    navigate(`/drops/${drop.id}`); // Drop detay sayfasına yönlendir
+  };
   return (
-    <div
-      style={{
-        border: "1px solid #ccc",
-        padding: "15px",
-        borderRadius: "8px",
-        cursor: "pointer",
-      }}
-      onClick={() => navigate(`/drops/${drop.id}`)}
-    >
-      <h3>{drop.title}</h3>
+    <div className="drop-card" onClick={handleClick}>
+      <h2>{drop.title}</h2>
       <p>{drop.description}</p>
       <p>
-        Claim Window: {dayjs(drop.claim_window_start).format("HH:mm")} -{" "}
-        {dayjs(drop.claim_window_end).format("HH:mm")}
+        <strong>Claim Window:</strong>
+        <br />
+        {formatDate(drop.claim_window_start)} - {formatDate(drop.claim_window_end)}
       </p>
     </div>
   );

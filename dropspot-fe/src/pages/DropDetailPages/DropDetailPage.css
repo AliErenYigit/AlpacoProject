@@ -1,0 +1,113 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+.drop-detail-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #7088b9, #1e3c72);
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+.drop-detail-box {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 40px 60px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.drop-detail-box h1 {
+  font-size: 28px;
+  color: #1e3c72;
+  margin-bottom: 10px;
+}
+
+.desc {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.button-group {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.button-group button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.join {
+  background-color: #1e3c72;
+  color: white;
+}
+.join:hover {
+  background-color: #2e559b;
+}
+
+.leave {
+  background-color: #b71c1c;
+  color: white;
+}
+.leave:hover {
+  background-color: #d32f2f;
+}
+
+.claim {
+  background-color: #2e7d32;
+  color: white;
+}
+.claim:hover {
+  background-color: #43a047;
+}
+
+.claim-code-box {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #333;
+  background-color: #e9f7ef;
+  border: 1px solid #a5d6a7;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.back-btn {
+  margin-top: 30px;
+  background: none;
+  border: none;
+  color: #1e3c72;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.back-btn:hover {
+  color: #2e559b;
+}
+
+.loading-text {
+  text-align: center;
+  font-size: 18px;
+  color: white;
+  margin-top: 40vh;
+}

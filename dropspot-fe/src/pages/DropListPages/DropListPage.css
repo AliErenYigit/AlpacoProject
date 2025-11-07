@@ -1,0 +1,55 @@
+/* Genel reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Arka plan */
+.drop-list-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #7088b9, #1e3c72);
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+/* Ortadaki kutu */
+.drop-list-box {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 900px;
+  text-align: center;
+}
+
+/* Başlık */
+.drop-list-title {
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #1e3c72;
+  font-weight: 700;
+}
+
+/* Drop listesi */
+.drop-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Boş liste */
+.no-drops {
+  font-size: 18px;
+  color: #666;
+}
