@@ -1,12 +1,10 @@
 {
   "name": "dropspot-be",
   "version": "1.0.0",
-  "main": "src/server.js",
-  "type": "module",
+  "main": "src/app.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "db:sync": "node src/models/sync.js",
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
     "seed:calc": "node src/utils/seed.js"
   },
   "keywords": [],
@@ -19,7 +17,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "nanoid": "^5.1.6",
+    "nanoid": "^3.3.11",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
