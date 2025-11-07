@@ -23,7 +23,7 @@ app.use('/api/admin', adminRoutes);
 // Ortam değişkenlerini yükle (.env)
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 
 // Sağlık kontrolü
