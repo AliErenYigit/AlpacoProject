@@ -1,55 +1,101 @@
 const { Drop } = require('../models');
 
-
+// 📍 Tüm dropları listele (herkes görebilir)
 const listDropsAdmin = async (req, res) => {
-  const rows = await Drop.findAll({ order: [['created_at','DESC']] });
-  return res.json(rows);
-};
-
-const createDrop = async (req, res) => {
-  const { title, description, capacity, start_at, end_at, claim_window_start, claim_window_end } = req.body;
-  if (!title || !capacity || !start_at || !end_at || !claim_window_start || !claim_window_end)
-    return res.status(422).json({ error: 'invalid_payload' });
-
   try {
-    const d = await Drop.create({ title, description, capacity, start_at, end_at, claim_window_start, claim_window_end });
-    return res.status(201).json(d);
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: 'create_failed' });
+    const rows = await Drop.findAll({ order: [['created_at', 'DESC']] });
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "list_failed" });
   }
 };
 
-const updateDrop = async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const { title, description, capacity, start_at, end_at, claim_window_start, claim_window_end } = req.body;
-
+// 📍 Yeni drop oluştur (sadece admin)
+const createDrop = async (req, res) => {
   try {
-    const d = await Drop.findByPk(id);
-    if (!d) return res.status(404).json({ error: 'not_found' });
+    const { title, description, capacity, start_at, end_at, claim_window_start, claim_window_end } = req.body;
+    const user = req.user;
 
-    await d.update({
-      title: title ?? d.title,
-      description: description ?? d.description,
-      capacity: capacity ?? d.capacity,
-      start_at: start_at ?? d.start_at,
-      end_at: end_at ?? d.end_at,
-      claim_window_start: claim_window_start ?? d.claim_window_start,
-      claim_window_end: claim_window_end ?? d.claim_window_end
+    if (!user) {
+      return res.status(401).json({ error: "unauthenticated" });
+    }
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: "forbidden" });
+    }
+
+    const drop = await Drop.create({
+      title,
+      description,
+      capacity,
+      start_at,
+      end_at,
+      claim_window_start,
+      claim_window_end,
+      user_id: user.id, // foreign key artık user_id olacak
     });
-    return res.json(d);
+
+    return res.status(201).json(drop);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "create_failed" });
+  }
+};
+
+// 📍 Drop güncelle (sadece admin + kendi drop’u)
+const updateDrop = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const { title, description, capacity, start_at, end_at, claim_window_start, claim_window_end } = req.body;
+    const user = req.user;
+
+    if (!user) return res.status(401).json({ error: 'unauthenticated' });
+    if (user.role !== 'admin') return res.status(403).json({ error: 'forbidden' });
+
+    const drop = await Drop.findByPk(id);
+    if (!drop) return res.status(404).json({ error: 'not_found' });
+
+    // admin yalnızca kendi droplarını güncelleyebilir
+    if (drop.user_id !== user.id) {
+      return res.status(403).json({ error: 'not_owner' });
+    }
+
+    await drop.update({
+      title: title ?? drop.title,
+      description: description ?? drop.description,
+      capacity: capacity ?? drop.capacity,
+      start_at: start_at ?? drop.start_at,
+      end_at: end_at ?? drop.end_at,
+      claim_window_start: claim_window_start ?? drop.claim_window_start,
+      claim_window_end: claim_window_end ?? drop.claim_window_end
+    });
+
+    return res.json(drop);
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: 'update_failed' });
   }
 };
 
+// 📍 Drop sil (sadece admin + kendi drop’u)
 const deleteDrop = async (req, res) => {
-  const id = parseInt(req.params.id, 10);
   try {
-    const d = await Drop.findByPk(id);
-    if (!d) return res.status(404).json({ error: 'not_found' });
-    await d.destroy();
+    const id = parseInt(req.params.id, 10);
+    const user = req.user;
+
+    if (!user) return res.status(401).json({ error: 'unauthenticated' });
+    if (user.role !== 'admin') return res.status(403).json({ error: 'forbidden' });
+
+    const drop = await Drop.findByPk(id);
+    if (!drop) return res.status(404).json({ error: 'not_found' });
+
+    // sadece kendi droplarını silebilir
+    if (drop.user_id !== user.id) {
+      return res.status(403).json({ error: 'not_owner' });
+    }
+
+    await drop.destroy();
     return res.status(204).end();
   } catch (e) {
     console.error(e);

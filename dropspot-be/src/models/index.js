@@ -1,5 +1,5 @@
 const User = require('./User');
-const AdminUser = require('./Admin');
+
 const Drop = require('./Drop');
 const Waitlist = require('./WaitList');
 const Claim = require('./Claim');
@@ -18,7 +18,6 @@ const Claim = require('./Claim');
 
   module.exports = {
     User,
-    AdminUser,
     Drop,
     Waitlist,
     Claim,

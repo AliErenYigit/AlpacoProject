@@ -1,35 +1,53 @@
-const jwt=require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-const requireAuth=(req,res,next)=>{
-    const auth=req.headers.authorization;
-    const token=auth.startsWith('Bearer ')?auth.slice(7,auth.length):null;
-    if(!token){return res.status(401).json({message:'Yetkilendirme tokeni gerekli.'});}
-    try{
-         const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: payload.sub, email: payload.email, role: payload.role || 'user' };
-    console.log('✅ requireAuth set req.user:', req.user); // <--- test
-    next();
-    }catch(err){
-        return res.status(401).json({message:'Geçersiz token.'});
+/**
+ * Genel kimlik doğrulama.
+ * Kullanıcının giriş yapıp yapmadığını kontrol eder.
+ * Token geçerliyse req.user içerisine { id, email, role } bilgilerini ekler.
+ */
+const requireAuth = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization || "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "authorization_header_missing" });
     }
-};
 
-const requireAdmin=(req,res,next)=>{
-     const auth = req.headers.authorization || '';
-    const token=auth.startsWith('Bearer ')?auth.slice(7,auth.length):null;
-      console.log('--- DEBUG ---');
-  console.log('Authorization header:', auth);
-  console.log('Extracted token:', token);
-  console.log('JWT_SECRET (from env):', process.env.JWT_SECRET);
-    if(!token){return res.status(401).json({message:'Yetkilendirme tokeni gerekli.'});}
-    try{
+    const token = authHeader.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "token_missing" });
+
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    if (payload.role !== 'admin') return res.status(403).json({ error: 'forbidden' });
-    req.user = { id: payload.sub, email: payload.email, role: 'admin' };
+
+    req.user = {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role ,
+    };
+
+    // Debug (isteğe bağlı)
+    // console.log("✅ Authenticated user:", req.user);
+
     next();
-  } catch {
-    return res.status(401).json({ error: 'unauthorized' });
-    }
+  } catch (err) {
+    console.error("JWT verify failed:", err.message);
+    return res.status(401).json({ error: "invalid_token" });
+  }
 };
 
-module.exports={requireAuth,requireAdmin};
+/**
+ * Admin rolü kontrolü.
+ * requireAuth sonrasında çağrılır.
+ * Eğer role !== "admin" ise erişimi engeller.
+ */
+const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "unauthenticated" });
+  }
+
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "forbidden" });
+  }
+
+  next();
+};
+
+module.exports = { requireAuth, requireAdmin };
