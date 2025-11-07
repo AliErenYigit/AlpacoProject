@@ -60,6 +60,17 @@ const joinWaitlist = async (req, res) => {
     return res.status(500).json({ error: "join_failed" });
   }
 };
+const getDropById = async (req, res) => {
+  const dropId = parseInt(req.params.id, 10);
+  try {
+    const drop = await Drop.findByPk(dropId);
+    if (!drop) return res.status(404).json({ error: "drop_not_found" });
+    return res.json(drop);
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "fetch_failed" });
+  }
+};
 
 const leaveWaitlist = async (req, res) => {
   const userId = req.user.id;
@@ -174,4 +185,4 @@ const claimDrop = async (req, res) => {
   }
 };
 
-module.exports = { getDrops, joinWaitlist, leaveWaitlist, claimDrop };
+module.exports = { getDrops,getDropById, joinWaitlist, leaveWaitlist, claimDrop };
