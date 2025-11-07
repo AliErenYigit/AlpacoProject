@@ -43,6 +43,17 @@ const createDrop = async (req, res) => {
   }
 };
 
+const getDropByIdAdmin = async (req, res) => {
+  try {
+    const dropId = parseInt(req.params.id, 10);
+    const drop = await Drop.findByPk(dropId);
+    if (!drop) return res.status(404).json({ error: "drop_not_found" });
+    return res.json(drop);
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "fetch_failed" });
+  }
+};
 // 📍 Drop güncelle (sadece admin + kendi drop’u)
 const updateDrop = async (req, res) => {
   try {
@@ -103,4 +114,4 @@ const deleteDrop = async (req, res) => {
   }
 };
 
-module.exports = { listDropsAdmin, createDrop, updateDrop, deleteDrop };
+module.exports = { listDropsAdmin, createDrop, updateDrop, deleteDrop,getDropByIdAdmin };
