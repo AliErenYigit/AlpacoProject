@@ -16,6 +16,7 @@ export default function AdminDropForm({ onSave }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: 20 }}>
+   
       <input
         placeholder="Title"
         value={form.title}

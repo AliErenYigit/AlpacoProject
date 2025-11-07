@@ -1,0 +1,28 @@
+.drop-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  transition: all 0.3s ease;
+  cursor: pointer; /* 👈 tıklanabilir hale getirir */
+}
+
+.drop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  background-color: #f7f9ff; /* hover rengi */
+}
+
+
+.drop-card h2 {
+  color: #1e3c72;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.drop-card p {
+  color: #555;
+  margin: 4px 0;
+  font-size: 15px;
+}
