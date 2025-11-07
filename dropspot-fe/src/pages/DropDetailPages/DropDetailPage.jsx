@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosClient from "../../api/axiosClient";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
 import "./DropDetailPage.css";
 
 export default function DropDetailPage() {
@@ -11,49 +12,102 @@ export default function DropDetailPage() {
   const [claimCode, setClaimCode] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Drop detayını getir
+  // 🔹 Drop detayını getir
   useEffect(() => {
     axiosClient
       .get(`/drops/${id}`)
       .then((res) => setDrop(res.data))
-      .catch(() => alert("Drop not found"));
+      .catch(() =>
+        Swal.fire({
+          icon: "error",
+          title: "Drop not found",
+          text: "The requested drop could not be found.",
+          confirmButtonColor: "#2563eb",
+        })
+      );
   }, [id]);
 
-  // Waitlist'e katıl
+  // 🔹 Waitlist'e katıl
   const join = async () => {
     try {
       setLoading(true);
       await axiosClient.post(`/drops/${id}/join`);
-      alert("✅ Joined waitlist!");
+      Swal.fire({
+        icon: "success",
+        title: "Joined Successfully 🎉",
+        text: "You have been added to the waitlist!",
+        confirmButtonColor: "#2563eb",
+        timer: 2000,
+      });
     } catch (err) {
-      alert(err.response?.data?.error || "join_failed");
+      Swal.fire({
+        icon: "error",
+        title: "Join Failed ❌",
+        text: err.response?.data?.error || "Something went wrong.",
+        confirmButtonColor: "#ef4444",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Waitlist'ten ayrıl
+  // 🔹 Waitlist'ten ayrıl
   const leave = async () => {
     try {
       setLoading(true);
+      const confirm = await Swal.fire({
+        title: "Leave Waitlist?",
+        text: "Are you sure you want to leave the waitlist?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Leave",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#ef4444",
+      });
+      if (!confirm.isConfirmed) return;
+
       await axiosClient.post(`/drops/${id}/leave`);
-      alert("👋 Left waitlist!");
+      Swal.fire({
+        icon: "success",
+        title: "Left Successfully 👋",
+        text: "You have left the waitlist.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      alert(err.response?.data?.error || "leave_failed");
+      Swal.fire({
+        icon: "error",
+        title: "Leave Failed ❌",
+        text: err.response?.data?.error || "Something went wrong.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Claim işlemi
+  // 🔹 Claim işlemi
   const claim = async () => {
     try {
       setLoading(true);
       const res = await axiosClient.post(`/drops/${id}/claim`);
       setClaimCode(res.data.claim_code);
-      alert("🎉 Claim successful!");
+      Swal.fire({
+        icon: "success",
+        title: "Claim Successful 🎁",
+        html: `
+          <p>You have successfully claimed your drop!</p>
+          <p><strong>Claim Code:</strong></p>
+          <p style="font-size: 1.2rem; color: #2563eb; font-weight: bold;">${res.data.claim_code}</p>
+        `,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#2563eb",
+      });
     } catch (err) {
-      alert(err.response?.data?.error || "claim_failed");
+      Swal.fire({
+        icon: "error",
+        title: "Claim Failed ❌",
+        text: err.response?.data?.error || "Something went wrong.",
+      });
     } finally {
       setLoading(false);
     }
@@ -89,7 +143,8 @@ export default function DropDetailPage() {
 
         {claimCode && (
           <div className="claim-code-box">
-            <strong>Your claim code:</strong> <span>{claimCode}</span>
+            <strong>Your claim code:</strong>{" "}
+            <span style={{ color: "#2563eb" }}>{claimCode}</span>
           </div>
         )}
 

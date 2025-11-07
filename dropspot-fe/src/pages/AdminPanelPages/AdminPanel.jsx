@@ -61,81 +61,99 @@ const createDrop = async () => {
   }
 };
 const updateDrop = async (drop) => {
+  try {
+    // Eğer drop eksikse, backend'den tam veriyi çek
+    const { data } = await axiosClient.get(`/admin/drops/${drop.id}`);
+    console.log("Fetched drop data:", data);
+    drop = data;
+  } catch (e) {
+    console.warn("Drop details could not be fetched, using local data.");
+  }
   const { value: formValues } = await Swal.fire({
-    title: '<h2 style="color:#1e3a8a; font-weight:700;">Edit Drop</h2>',
-    html: `
-      <div style="
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        text-align: left;
-        font-family: 'Inter', sans-serif;
-        padding: 5px;
-        font-size: 0.9rem;
-      ">
-        <div>
-          <label style="font-weight:600;">Title</label>
-          <input id="swal-title" class="swal2-input" 
-            style="width:100%; height:35px; font-size:0.9rem;" 
-            value="${drop?.title ?? ''}">
-        </div>
+   title: '<h2 style="color:#1e3a8a; font-weight:700; margin-bottom:10px;">Edit Drop</h2>',
+html: `
+  <div style="
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    padding: 0 8px;
+    font-size: 0.9rem;
+    max-width: 480px;
+    margin-left: 0;          /* sola yaslama */
+  ">
 
-        <div>
-          <label style="font-weight:600;">Description</label>
-          <input id="swal-description" class="swal2-input" 
-            style="width:100%; height:35px; font-size:0.9rem;" 
-            value="${drop?.description ?? ''}">
-        </div>
+    <!-- Title -->
+    <div>
+      <label style="font-weight:600;">Title</label>
+      <input id="swal-title" class="swal2-input"
+        style="width:100%; height:36px; font-size:0.9rem; margin-left:0;"
+        value="${drop?.title ?? ''}">
+    </div>
 
-        <div>
-          <label style="font-weight:600;">Capacity</label>
-          <input id="swal-capacity" type="number" class="swal2-input" 
-            style="width:100%; height:35px; font-size:0.9rem;" 
-            value="${drop?.capacity ?? ''}">
-        </div>
+    <!-- Description -->
+    <div>
+      <label style="font-weight:600;">Description</label>
+      <input id="swal-description" class="swal2-input"
+        style="width:100%; height:36px; font-size:0.9rem; margin-left:0;"
+        value="${drop?.description ?? ''}">
+    </div>
 
-        <!-- First date row -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <div>
-            <label style="font-weight:600;">Start At</label>
-            <input id="swal-start" type="datetime-local" class="swal2-input" 
-              style="width:100%; height:35px; font-size:0.9rem;" 
-              value="${drop?.start_at ? dayjs(drop.start_at).format('YYYY-MM-DDTHH:mm') : ''}">
-          </div>
-          <div>
-            <label style="font-weight:600;">End At</label>
-            <input id="swal-end" type="datetime-local" class="swal2-input" 
-              style="width:100%; height:35px; font-size:0.9rem;" 
-              value="${drop?.end_at ? dayjs(drop.end_at).format('YYYY-MM-DDTHH:mm') : ''}">
-          </div>
-        </div>
+    <!-- Capacity -->
+    <div>
+      <label style="font-weight:600;">Capacity</label>
+      <input id="swal-capacity" type="number" class="swal2-input"
+        style="width:100%; height:36px; font-size:0.9rem; margin-left:0;"
+        value="${drop?.capacity ?? ''}">
+    </div>
 
-        <!-- Second date row -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <div>
-            <label style="font-weight:600;">Claim Start</label>
-            <input id="swal-claim-start" type="datetime-local" class="swal2-input" 
-              style="width:100%; height:35px; font-size:0.9rem;" 
-              value="${drop?.claim_window_start ? dayjs(drop.claim_window_start).format('YYYY-MM-DDTHH:mm') : ''}">
-          </div>
-          <div>
-            <label style="font-weight:600;">Claim End</label>
-            <input id="swal-claim-end" type="datetime-local" class="swal2-input" 
-              style="width:100%; height:35px; font-size:0.9rem;" 
-              value="${drop?.claim_window_end ? dayjs(drop.claim_window_end).format('YYYY-MM-DDTHH:mm') : ''}">
-          </div>
-        </div>
+    <!-- Start/End -->
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1;">
+        <label style="font-weight:600;">Start At</label>
+        <input id="swal-start" type="datetime-local" class="swal2-input"
+          style="width:100%; height:36px; font-size:0.9rem; margin-left:0;"
+          value="${drop?.start_at ? dayjs(drop.start_at).format('YYYY-MM-DDTHH:mm') : ''}">
       </div>
-    `,
+      <div style="flex:1;">
+        <label style="font-weight:600;">End At</label>
+        <input id="swal-end" type="datetime-local" class="swal2-input"
+          style="width:100%; height:36px; font-size:0.9rem; margin-left:0;"
+          value="${drop?.end_at ? dayjs(drop.end_at).format('YYYY-MM-DDTHH:mm') : ''}">
+      </div>
+    </div>
+
+    <!-- Claim Start/End -->
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1;">
+        <label style="font-weight:600;">Claim Start</label>
+        <input id="swal-claim-start" type="datetime-local" class="swal2-input"
+          style="width:100%; height:36px; font-size:0.9rem; margin-left:0;"
+          value="${drop?.claim_window_start ? dayjs(drop.claim_window_start).format('YYYY-MM-DDTHH:mm') : ''}">
+      </div>
+      <div style="flex:1;">
+        <label style="font-weight:600;">Claim End</label>
+        <input id="swal-claim-end" type="datetime-local" class="swal2-input"
+          style="width:100%; height:36px; font-size:0.9rem; margin-left:0;"
+          value="${drop?.claim_window_end ? dayjs(drop.claim_window_end).format('YYYY-MM-DDTHH:mm') : ''}">
+      </div>
+    </div>
+  </div>
+`,
     showCancelButton: true,
     confirmButtonText: "💾 Save Changes",
     cancelButtonText: "Cancel",
     confirmButtonColor: "#2563eb",
     cancelButtonColor: "#6b7280",
     background: "#f9fafb",
-    width: "500px",            // 🔹 daha dar modal
+    width: "520px",
     heightAuto: true,
     scrollbarPadding: false,
+    allowOutsideClick: false,
+    customClass: {
+      popup: "no-horizontal-scroll"
+    },
     preConfirm: () => ({
       title: document.getElementById("swal-title").value,
       description: document.getElementById("swal-description").value,
@@ -166,11 +184,6 @@ const updateDrop = async (drop) => {
     }
   }
 };
-
-
-
-
-
 
 
     const deleteDrop = async (id) => {
@@ -286,7 +299,7 @@ const updateDrop = async (drop) => {
                   </p>
                 </div>
                 <div className="drop-actions">
-                  <button className="btn-edit" onClick={() => updateDrop(drop.id)}>Edit</button>
+                  <button className="btn-edit" onClick={() => updateDrop(drop)}>Edit</button>
                   <button className="btn-delete" onClick={() => deleteDrop(drop.id)}>Delete</button>
                 </div>
               </div>
