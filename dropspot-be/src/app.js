@@ -4,6 +4,7 @@ const sequelize = require("./db/database");
 const cors = require("cors");
 const publicRoutes = require('./routes/public');
 const adminRoutes = require('./routes/admin');
+require("./jobs/dropStatusJob");
 
 
 const app = express();
