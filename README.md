@@ -12,6 +12,7 @@
 
 
 ---
+### Proje oluşturma : ‎7 ‎Kasım ‎2025 ‎Cuma, ‏‎11:11:11
 
 ## 🧭 1️⃣ Proje Özeti ve Mimari Yapı
 
