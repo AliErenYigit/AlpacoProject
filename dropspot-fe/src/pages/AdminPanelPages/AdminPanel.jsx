@@ -4,8 +4,14 @@ import dayjs from "dayjs";
 import "./AdminPanel.css";
 import Swal from "sweetalert2";
 
+import useAuth from "../../hooks/useAuth";
+
+import { useNavigate } from "react-router-dom";
+
 export default function AdminPanel() {
   const [drops, setDrops] = useState([]);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -22,44 +28,72 @@ export default function AdminPanel() {
   };
 
   useEffect(() => {
-    fetchDrops();
-  }, []);
+    if (!user) {
+      Swal.fire({
+        icon: "warning",
+        title: "Oturumunuz kapatıldı",
+        text: "Lütfen yeniden giriş yapın.",
+        confirmButtonText: "Giriş Sayfasına Git",
+        confirmButtonColor: "#2563eb",
+        allowOutsideClick: false,
+      }).then(() => {
+        logout();
+        navigate("/login");
+      });
+      return;
+    }
 
+    if (user.role !== "admin") {
+      Swal.fire({
+        icon: "warning",
+        title: "Oturumunuz kapatıldı",
+        text: "Lütfen yeniden giriş yapınız.",
+        confirmButtonText: "Ana Sayfaya Dön",
+        confirmButtonColor: "#2563eb",
+        allowOutsideClick: false,
+      }).then(() => {
+        navigate("/");
+      });
+    }
+    fetchDrops();
+  }, [user, logout, navigate]);
+
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-const createDrop = async () => {
-  try {
-    await axiosClient.post("/admin/drops", form);
+  const createDrop = async () => {
+    try {
+      await axiosClient.post("/admin/drops", form);
 
-    Swal.fire({
-      icon: "success",
-      title: "Drop created successfully!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+      Swal.fire({
+        icon: "success",
+        title: "Drop created successfully!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
 
-    // 🔹 Form resetlensin
-    setForm({
-      title: "",
-      description: "",
-      capacity: "",
-      start_at: "",
-      end_at: "",
-      claim_window_start: "",
-      claim_window_end: "",
-    });
+      setForm({
+        title: "",
+        description: "",
+        capacity: "",
+        start_at: "",
+        end_at: "",
+        claim_window_start: "",
+        claim_window_end: "",
+      });
 
-    fetchDrops(); // 🔹 Listeyi yenile
-  } catch (err) {
-    Swal.fire({
-      icon: "error",
-      title: "Create Failed",
-      text: err.response?.data?.error || "Something went wrong.",
-    });
-  }
-};
+      fetchDrops();
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Create Failed",
+        text: err.response?.data?.error || "Something went wrong.",
+      });
+    }
+  };
+
 const updateDrop = async (drop) => {
   try {
     // Eğer drop eksikse, backend'den tam veriyi çek
@@ -219,9 +253,14 @@ html: `
 
   return (
     <div className="admin-container">
+      
       <div className="admin-box">
+       <div className="admin-header">
         <h1 className="admin-title">Admin Panel</h1>
-
+        {/* 🔹 Admin e-posta gösterimi */}
+        <p className="admin-email">{user.email}</p>
+      </div>
+        {/* 🔹 Yeni Drop Oluşturma Formu */}
         <section className="drop-form">
           <h2>Create / Update Drop</h2>
           <div className="form-grid">
@@ -284,6 +323,7 @@ html: `
           </button>
         </section>
 
+        {/* 🔹 Mevcut Droplar Listesi */}
         <section className="drop-list-section">
           <h2>Existing Drops</h2>
           <div className="drop-list">
@@ -292,8 +332,22 @@ html: `
                 <div className="drop-info">
                   <h3>{drop.title}</h3>
                   <p>{drop.description}</p>
+
+                  {/* 🔹 Yeni Eklenen Kısım */}
+                 <p>
+          <strong>Capacity:</strong> {drop.capacity}
+        </p>
                   <p>
-                    Claim Window:{" "}
+                    <strong>Start:</strong>{" "}
+                    {dayjs(drop.start_at).format("DD MMM YYYY, HH:mm")}
+                  </p>
+                  <p>
+                    <strong>End:</strong>{" "}
+                    {dayjs(drop.end_at).format("DD MMM YYYY, HH:mm")}
+                  </p>
+
+                  <p>
+                    <strong>Claim Window:</strong>{" "}
                     {dayjs(drop.claim_window_start).format("DD MMM YYYY, HH:mm")} -{" "}
                     {dayjs(drop.claim_window_end).format("HH:mm")}
                   </p>
