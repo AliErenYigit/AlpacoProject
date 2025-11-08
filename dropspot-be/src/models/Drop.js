@@ -33,6 +33,11 @@ const Drop = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+      status: {
+      type: DataTypes.ENUM("upcoming", "active", "ended"),
+      allowNull: false,
+      defaultValue: "upcoming", // başlangıçta upcoming
+    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

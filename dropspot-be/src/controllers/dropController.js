@@ -1,17 +1,19 @@
 const crypto = require("crypto");
 const { nanoid } = require("nanoid");
-const { Drop, Waitlist, Claim } = require("../models");
+const { Drop, Waitlist, Claim,User} = require("../models");
 const sequelize = require("../db/database");
 const { computePriorityScore } = require("../utils/priority");
+const { getSeed } = require("../utils/seed");
 const { Op } = require("sequelize");
+const dayjs = require("dayjs");
 
-// 🔐 seed hesaplama (her ortamda farklı deterministik değer)
-const getSeed = () => {
-  const raw =
-    (process.env.SEED_RAW || "local") +
-    (process.env.PROJECT_START_YYYYMMDDHHmm || "");
-  return crypto.createHash("sha256").update(raw).digest("hex").slice(0, 12);
-};
+// // 🔐 seed hesaplama (her ortamda farklı deterministik değer)
+// const getSeed = () => {
+//   const raw =
+//     (process.env.SEED_RAW || "local") +
+//     (process.env.PROJECT_START_YYYYMMDDHHmm || "");
+//   return crypto.createHash("sha256").update(raw).digest("hex").slice(0, 12);
+// };
 
 // 📍 Tüm drop'ları listele (her kullanıcı erişebilir)
 const getDrops = async (req, res) => {
@@ -39,21 +41,27 @@ const getDropById = async (req, res) => {
   }
 };
 
-// 📍 Kullanıcı drop bekleme listesine katılır
 const joinWaitlist = async (req, res) => {
-  const userId = req.user.id; // token'dan geliyor
+  const userId = req.user.id; // token'dan
   const dropId = parseInt(req.params.id, 10);
 
   try {
     const drop = await Drop.findByPk(dropId);
     if (!drop) return res.status(404).json({ error: "drop_not_found" });
 
-    const seed = getSeed();
-    // bu değerler şu an sabit ama ileride kullanıcı davranışına göre hesaplanabilir
-    const signupLatency = 1234;
-    const accountAgeDays = 7;
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ error: "user_not_found" });
+
+    // 1️⃣ Dinamik değerler
+    const createdAt = dayjs(user.createdAt);
+    const signupLatency = 1000; // eğer ölçüm sistemin yoksa şimdilik sabit bırak
+    const accountAgeDays = dayjs().diff(createdAt, "day");
     const rapidActions = 0;
 
+    // 2️⃣ Seed oluştur
+    const seed = getSeed();
+
+    // 3️⃣ Öncelik hesapla
     const priority = computePriorityScore({
       base: 100,
       signup_latency_ms: signupLatency,
@@ -62,6 +70,7 @@ const joinWaitlist = async (req, res) => {
       seed,
     });
 
+    // 4️⃣ Waitlist'e ekle veya var olanı getir
     await Waitlist.findOrCreate({
       where: { user_id: userId, drop_id: dropId },
       defaults: {
@@ -72,12 +81,39 @@ const joinWaitlist = async (req, res) => {
       },
     });
 
-    return res.status(201).json({ ok: true });
+    return res.status(201).json({ ok: true, priority });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "join_failed" });
   }
 };
+// 📍 Kullanıcının belirli bir drop'taki waitlist durumunu getirir
+const getWaitlistStatus = async (req, res) => {
+  const userId = req.user.id;
+  const dropId = parseInt(req.params.id, 10);
+
+  try {
+    const record = await Waitlist.findOne({
+      where: { user_id: userId, drop_id: dropId },
+      attributes: ["status", "priority_score"],
+    });
+
+    if (!record) {
+      // Kullanıcının kaydı yoksa status null dönelim
+      return res.json({ status: null, in_waitlist: false });
+    }
+
+    return res.json({
+      status: record.status, // örn: "waiting", "claimed", "left"
+      in_waitlist: record.status === "waiting" || record.status === "claimed",
+      priority_score: record.priority_score,
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "status_fetch_failed" });
+  }
+};
+
 
 // 📍 Kullanıcı bekleme listesinden ayrılır
 const leaveWaitlist = async (req, res) => {
@@ -190,4 +226,4 @@ const claimDrop = async (req, res) => {
   }
 };
 
-module.exports = { getDrops, getDropById, joinWaitlist, leaveWaitlist, claimDrop };
+module.exports = { getDrops, getDropById, joinWaitlist, leaveWaitlist, claimDrop,getWaitlistStatus };
