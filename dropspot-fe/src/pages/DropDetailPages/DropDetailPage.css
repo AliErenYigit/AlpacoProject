@@ -35,6 +35,14 @@ html, body {
   margin-bottom: 10px;
 }
 
+.drop-detail-box p {
+  margin: 6px 0;
+  color: #333;
+}
+
+.drop-detail-box strong {
+  color: #111;
+}
 .desc {
   color: #555;
   font-size: 16px;

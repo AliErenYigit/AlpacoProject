@@ -34,11 +34,36 @@ html, body {
 }
 
 /* Başlık */
-.drop-list-title {
-  margin-bottom: 25px;
-  font-size: 28px;
-  color: #1e3c72;
+.drop-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 16px;
+}
+
+.drop-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drop-icon {
+  font-size: 1.8rem;
+}
+
+.drop-title {
+  font-size: 1.8rem;
   font-weight: 700;
+  color: #1e3a8a;
+  margin: 0;
+}
+
+.drop-email {
+  font-size: 1rem;
+  color: #374151;
+  font-weight: 500;
+  margin: 0;
 }
 
 /* Drop listesi */
